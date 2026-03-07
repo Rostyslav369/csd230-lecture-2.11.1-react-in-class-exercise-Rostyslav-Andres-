@@ -65,3 +65,22 @@ body {
     border-radius:6px;
     cursor:pointer;
 }
+
+.navbar {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+}
+
+.navbar a {
+    text-decoration: none;
+    font-weight: bold;
+    color: #111;
+}
+
+.navbar a:hover {
+    text-decoration: underline;
+}

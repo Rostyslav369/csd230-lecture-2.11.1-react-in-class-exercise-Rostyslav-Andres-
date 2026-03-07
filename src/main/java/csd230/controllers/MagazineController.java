@@ -9,7 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/magazines")
-@CrossOrigin(origins = "http://localhost:5173") // Allow Vite React App
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174"}) // Allow Vite React App
 public class MagazineController {
 
     private final BookRepository magazineRepository;
