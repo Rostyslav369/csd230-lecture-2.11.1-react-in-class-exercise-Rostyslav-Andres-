@@ -1,42 +1,67 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+body {
+    margin:0;
+    font-family: Arial;
+    background:#1e1e1e;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.app-container{
+    max-width:800px;
+    margin:auto;
+    padding:20px;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.book-list{
+    display:flex;
+    flex-direction:column;
+    gap:15px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.book-row{
+    background:#f3f3f3;
+    border-radius:8px;
+    padding:15px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
 }
 
-.card {
-  padding: 2em;
+.book-info{
+    color:#111;
 }
 
-.read-the-docs {
-  color: #888;
+.book-info h3{
+    margin:0 0 5px 0;
+}
+
+.delete-btn{
+    background:#ff4d4d;
+    color:white;
+    border:none;
+    padding:8px 14px;
+    border-radius:6px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.book-form{
+    background:white;
+    padding:20px;
+    border-radius:8px;
+    margin-bottom:20px;
+}
+
+.book-form input{
+    display:block;
+    width:100%;
+    margin-bottom:10px;
+    padding:8px;
+}
+
+.book-form button{
+    background:#222;
+    color:white;
+    border:none;
+    padding:10px 16px;
+    border-radius:6px;
+    cursor:pointer;
 }

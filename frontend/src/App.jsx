@@ -1,35 +1,85 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState, useEffect } from 'react'
+import Book from './Book'
+import BookForm from './BookForm'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    const [books, setBooks] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    const loadBooks = () => {
+        fetch('/api/books')
+            .then(res => {
+                if (!res.ok) throw new Error("Could not fetch books");
+                return res.json();
+            })
+            .then(data => {
+                setBooks(data);
+                setLoading(false);
+            })
+            .catch(err => {
+                setError(err.message);
+                setLoading(false);
+            });
+    };
+
+    useEffect(() => {
+        loadBooks();
+    }, []);
+
+    const handleAddBook = () => {
+        loadBooks();
+    };
+
+    const handleDeleteBook = (bookId) => {
+        const confirmed = window.confirm("Are you sure you want to delete this book?");
+
+        if (!confirmed) return;
+
+        fetch(`/api/books/${bookId}`, {
+            method: 'DELETE',
+        })
+            .then(response => {
+                if (response.ok) {
+                    loadBooks();
+                } else {
+                    alert("Failed to delete the book.");
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Error deleting book.");
+            });
+    };
+
+    if (loading) return <h2>Loading Bookstore Inventory...</h2>;
+    if (error) return <h2 style={{color:'red'}}>Error: {error}</h2>;
+
+    return (
+        <div className="app-container">
+
+            <h1>Bookstore Management</h1>
+            <p>Managing {books.length} books in inventory</p>
+
+            <BookForm onBookAdded={handleAddBook} />
+
+            <div className="book-list">
+                {books.map((b) => (
+                    <Book
+                        key={b.id}
+                        id={b.id}
+                        title={b.title}
+                        author={b.author}
+                        price={b.price}
+                        onDelete={handleDeleteBook}
+                    />
+                ))}
+            </div>
+
+        </div>
+    )
 }
 
 export default App
