@@ -1,87 +1,73 @@
 import { useState } from 'react';
 
-function BookForm({ onBookAdded }) {
-
+function BookForm({ onBookAdded, api }) {
     const [title, setTitle] = useState('');
     const [author, setAuthor] = useState('');
-    const [price, setPrice] = useState(0);
-    const [copies, setCopies] = useState(1);
+    const [price, setPrice] = useState('');
+    const [copies, setCopies] = useState('');
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         const newBook = {
             title,
             author,
-            price: Number(price),
-            copies: Number(copies)
+            price: parseFloat(price),
+            copies: parseInt(copies)
         };
 
-        fetch('/api/books', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(newBook),
-        })
-            .then(response => {
-                if (!response.ok) throw new Error("Failed to save book");
-                return response.json();
-            })
-            .then(() => {
-                alert("Book Saved!");
-                onBookAdded();
+        try {
+            const res = await api.post('/books', newBook);
+            onBookAdded(res.data);
 
-                setTitle('');
-                setAuthor('');
-                setPrice(0);
-                setCopies(1);
-            })
-            .catch(err => {
-                alert(err.message);
-            });
+            setTitle('');
+            setAuthor('');
+            setPrice('');
+            setCopies('');
+
+            alert('Book added successfully');
+        } catch (err) {
+            console.error('Add book error:', err.response?.data || err.message);
+            alert(`Failed to save book: ${err.response?.status || err.message}`);
+        }
     };
 
     return (
-
-        <form onSubmit={handleSubmit} className="book-form">
-
-            <h3>Add New Book</h3>
+        <form onSubmit={handleSubmit} className="form-container">
+            <h2>Add New Book</h2>
 
             <input
-                type="text"
-                placeholder="Title"
                 value={title}
-                onChange={(e)=>setTitle(e.target.value)}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Title"
                 required
             />
 
             <input
-                type="text"
-                placeholder="Author"
                 value={author}
-                onChange={(e)=>setAuthor(e.target.value)}
+                onChange={(e) => setAuthor(e.target.value)}
+                placeholder="Author"
                 required
             />
 
             <input
                 type="number"
-                placeholder="Price"
+                step="0.01"
                 value={price}
-                onChange={(e)=>setPrice(e.target.value)}
+                onChange={(e) => setPrice(e.target.value)}
+                placeholder="Price"
                 required
             />
 
             <input
                 type="number"
-                placeholder="Copies"
                 value={copies}
-                onChange={(e)=>setCopies(e.target.value)}
+                onChange={(e) => setCopies(e.target.value)}
+                placeholder="Copies"
                 required
             />
 
-            <button type="submit">
-                Save to Database
-            </button>
-
+            <button type="submit">Save to Database</button>
         </form>
     );
 }

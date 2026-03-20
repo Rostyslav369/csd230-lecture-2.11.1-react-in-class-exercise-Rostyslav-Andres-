@@ -1,135 +1,159 @@
-import { useState, useEffect } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
-import Navbar from './Navbar'
-import Book from './Book'
-import BookForm from './BookForm'
-import Magazine from './Magazine'
-import MagazineForm from './MagazineForm'
-import './App.css'
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import Navbar from './Navbar';
+import Book from './Book';
+import BookForm from './BookForm';
+import Magazine from './Magazine';
+import MagazineForm from './MagazineForm';
+import Game from './Game';
+import GameForm from './GameForm';
+import Login from './pages/Login';
+import Logout from './pages/Logout';
+import { useAuth } from './provider/authProvider';
+import api from './api/axiosConfig';
+import './App.css';
 
 function App() {
-    const [books, setBooks] = useState([])
-    const [magazines, setMagazines] = useState([])
-    const [loadingBooks, setLoadingBooks] = useState(true)
-    const [loadingMagazines, setLoadingMagazines] = useState(true)
-    const [error, setError] = useState(null)
+    const { token, isAdmin } = useAuth();
 
-    const loadBooks = () => {
-        fetch('/api/books')
-            .then(res => {
-                if (!res.ok) throw new Error('Could not fetch books')
-                return res.json()
-            })
-            .then(data => {
-                setBooks(data)
-                setLoadingBooks(false)
-            })
-            .catch(err => {
-                setError(err.message)
-                setLoadingBooks(false)
-            })
-    }
-
-    const loadMagazines = () => {
-        fetch('/api/magazines')
-            .then(res => {
-                if (!res.ok) throw new Error('Could not fetch magazines')
-                return res.json()
-            })
-            .then(data => {
-                setMagazines(data)
-                setLoadingMagazines(false)
-            })
-            .catch(err => {
-                setError(err.message)
-                setLoadingMagazines(false)
-            })
-    }
+    const [books, setBooks] = useState([]);
+    const [magazines, setMagazines] = useState([]);
+    const [games, setGames] = useState([]);
 
     useEffect(() => {
-        loadBooks()
-        loadMagazines()
-    }, [])
+        if (!token) return;
 
-    const handleAddBook = () => {
-        loadBooks()
-    }
+        loadBooks();
+        loadMagazines();
+        loadGames();
+    }, [token]);
 
-    const handleDeleteBook = (bookId) => {
-        const confirmed = window.confirm('Are you sure you want to delete this book?')
-        if (!confirmed) return
+    const loadBooks = async () => {
+        try {
+            const res = await api.get('/books');
+            setBooks(res.data);
+        } catch (err) {
+            console.error('Load books error:', err.response?.data || err.message);
+        }
+    };
 
-        fetch(`/api/books/${bookId}`, { method: 'DELETE' })
-            .then(res => {
-                if (!res.ok) throw new Error('Failed to delete book')
-                loadBooks()
-            })
-            .catch(err => alert(err.message))
-    }
+    const loadMagazines = async () => {
+        try {
+            const res = await api.get('/magazines');
+            setMagazines(res.data);
+        } catch (err) {
+            console.error('Load magazines error:', err.response?.data || err.message);
+        }
+    };
 
-    const handleAddMagazine = () => {
-        loadMagazines()
-    }
+    const loadGames = async () => {
+        try {
+            const res = await api.get('/games');
+            setGames(res.data);
+        } catch (err) {
+            console.error('Load games error:', err.response?.data || err.message);
+        }
+    };
 
-    const handleDeleteMagazine = (magazineId) => {
-        const confirmed = window.confirm('Are you sure you want to delete this magazine?')
-        if (!confirmed) return
+    const handleDeleteBook = async (id) => {
+        try {
+            await api.delete(`/books/${id}`);
+            setBooks(prev => prev.filter(b => b.id !== id));
+            alert('Book deleted successfully');
+        } catch (err) {
+            console.error('Delete book error:', err.response?.data || err.message);
+            alert(`Delete failed: ${err.response?.status || err.message}`);
+        }
+    };
 
-        fetch(`/api/magazines/${magazineId}`, { method: 'DELETE' })
-            .then(res => {
-                if (!res.ok) throw new Error('Failed to delete magazine')
-                loadMagazines()
-            })
-            .catch(err => alert(err.message))
-    }
+    const handleUpdateBook = async (id, updated) => {
+        try {
+            const res = await api.put(`/books/${id}`, updated);
+            setBooks(prev => prev.map(b => (b.id === id ? res.data : b)));
+            alert('Book updated successfully');
+        } catch (err) {
+            console.error('Update book error:', err.response?.data || err.message);
+            alert(`Update failed: ${err.response?.status || err.message}`);
+        }
+    };
 
-    const handleUpdateMagazine = (updatedMagazine) => {
-        fetch(`/api/magazines/${updatedMagazine.id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(updatedMagazine),
-        })
-            .then(res => {
-                if (!res.ok) throw new Error('Failed to update magazine')
-                return res.json()
-            })
-            .then(() => {
-                loadMagazines()
-            })
-            .catch(err => alert(err.message))
-    }
+    const handleDeleteMagazine = async (id) => {
+        try {
+            await api.delete(`/magazines/${id}`);
+            setMagazines(prev => prev.filter(m => m.id !== id));
+            alert('Magazine deleted successfully');
+        } catch (err) {
+            console.error('Delete magazine error:', err.response?.data || err.message);
+            alert(`Delete failed: ${err.response?.status || err.message}`);
+        }
+    };
 
-    if (error) return <h2 style={{ color: 'red' }}>Error: {error}</h2>
+    const handleUpdateMagazine = async (id, updated) => {
+        try {
+            await api.put(`/magazines/${id}`, updated);
+            setMagazines(prev =>
+                prev.map(m => (m.id === id ? { ...m, ...updated } : m))
+            );
+            alert('Magazine updated successfully');
+        } catch (err) {
+            console.error('Update magazine error:', err.response?.data || err.message);
+            alert(`Update failed: ${err.response?.status || err.message}`);
+        }
+    };
+
+    const handleDeleteGame = async (id) => {
+        try {
+            await api.delete(`/games/${id}`);
+            setGames(prev => prev.filter(g => g.id !== id));
+            alert('Game deleted successfully');
+        } catch (err) {
+            console.error('Delete game error:', err.response?.data || err.message);
+            alert(`Delete failed: ${err.response?.status || err.message}`);
+        }
+    };
+
+    const handleUpdateGame = async (id, updated) => {
+        try {
+            const res = await api.put(`/games/${id}`, updated);
+            setGames(prev => prev.map(g => (g.id === id ? res.data : g)));
+            alert('Game updated successfully');
+        } catch (err) {
+            console.error('Update game error:', err.response?.data || err.message);
+            alert(`Update failed: ${err.response?.status || err.message}`);
+        }
+    };
+
+    const handleAddToCart = (id) => {
+        alert(`Add to cart clicked for item ${id}`);
+    };
 
     return (
-        <div className="app-container">
+        <>
             <Navbar />
 
             <Routes>
-                <Route path="/" element={<Navigate to="/books" />} />
+                <Route path="/" element={<Navigate to={token ? '/books' : '/login'} replace />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/logout" element={<Logout />} />
 
                 <Route
                     path="/books"
                     element={
-                        loadingBooks ? (
-                            <h2>Loading Books...</h2>
+                        token ? (
+                            <div className="book-list">
+                                <h1>Books</h1>
+                                {books.map(book => (
+                                    <Book
+                                        key={book.id}
+                                        {...book}
+                                        onDelete={handleDeleteBook}
+                                        onUpdate={handleUpdateBook}
+                                        onAddToCart={handleAddToCart}
+                                    />
+                                ))}
+                            </div>
                         ) : (
-                            <>
-                                <h1>Bookstore Management</h1>
-                                <p>Managing {books.length} books in inventory</p>
-                                <div className="book-list">
-                                    {books.map((b) => (
-                                        <Book
-                                            key={b.id}
-                                            id={b.id}
-                                            title={b.title}
-                                            author={b.author}
-                                            price={b.price}
-                                            onDelete={handleDeleteBook}
-                                        />
-                                    ))}
-                                </div>
-                            </>
+                            <Navigate to="/login" replace />
                         )
                     }
                 />
@@ -137,37 +161,35 @@ function App() {
                 <Route
                     path="/add-book"
                     element={
-                        <>
-                            <h1>Add Book</h1>
-                            <BookForm onBookAdded={handleAddBook} />
-                        </>
+                        token && isAdmin ? (
+                            <BookForm
+                                onBookAdded={(b) => setBooks(prev => [...prev, b])}
+                                api={api}
+                            />
+                        ) : (
+                            <Navigate to="/login" replace />
+                        )
                     }
                 />
 
                 <Route
                     path="/magazines"
                     element={
-                        loadingMagazines ? (
-                            <h2>Loading Magazines...</h2>
+                        token ? (
+                            <div className="book-list">
+                                <h1>Magazines</h1>
+                                {magazines.map(magazine => (
+                                    <Magazine
+                                        key={magazine.id}
+                                        {...magazine}
+                                        onDelete={handleDeleteMagazine}
+                                        onUpdate={handleUpdateMagazine}
+                                        onAddToCart={handleAddToCart}
+                                    />
+                                ))}
+                            </div>
                         ) : (
-                            <>
-                                <h1>Magazine Management</h1>
-                                <p>Managing {magazines.length} magazines in inventory</p>
-                                <div className="book-list">
-                                    {magazines.map((m) => (
-                                        <Magazine
-                                            key={m.id}
-                                            id={m.id}
-                                            title={m.title}
-                                            price={m.price}
-                                            orderQty={m.orderQty}
-                                            currentIssue={m.currentIssue}
-                                            onDelete={handleDeleteMagazine}
-                                            onUpdate={handleUpdateMagazine}
-                                        />
-                                    ))}
-                                </div>
-                            </>
+                            <Navigate to="/login" replace />
                         )
                     }
                 />
@@ -175,17 +197,55 @@ function App() {
                 <Route
                     path="/add-magazine"
                     element={
-                        <>
-                            <h1>Add Magazine</h1>
-                            <MagazineForm onMagazineAdded={handleAddMagazine} />
-                        </>
+                        token && isAdmin ? (
+                            <MagazineForm
+                                onMagazineAdded={(m) => setMagazines(prev => [...prev, m])}
+                                api={api}
+                            />
+                        ) : (
+                            <Navigate to="/login" replace />
+                        )
                     }
                 />
 
-                <Route path="*" element={<h2>Page Not Found</h2>} />
+                <Route
+                    path="/games"
+                    element={
+                        token ? (
+                            <div className="book-list">
+                                <h1>Games</h1>
+                                {games.map(game => (
+                                    <Game
+                                        key={game.id}
+                                        {...game}
+                                        onDelete={handleDeleteGame}
+                                        onUpdate={handleUpdateGame}
+                                        onAddToCart={handleAddToCart}
+                                    />
+                                ))}
+                            </div>
+                        ) : (
+                            <Navigate to="/login" replace />
+                        )
+                    }
+                />
+
+                <Route
+                    path="/add-game"
+                    element={
+                        token && isAdmin ? (
+                            <GameForm
+                                onGameAdded={(g) => setGames(prev => [...prev, g])}
+                                api={api}
+                            />
+                        ) : (
+                            <Navigate to="/login" replace />
+                        )
+                    }
+                />
             </Routes>
-        </div>
-    )
+        </>
+    );
 }
 
-export default App
+export default App;

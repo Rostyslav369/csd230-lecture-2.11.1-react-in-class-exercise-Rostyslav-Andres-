@@ -1,52 +1,38 @@
 import { useState } from 'react';
 import { useAuth } from './provider/authProvider';
 
-function Book({ id, title, author, price, copies, onDelete, onUpdate, onAddToCart }) {
+function Game({ id, title, price, copies, platform, genre, onDelete, onUpdate, onAddToCart }) {
     const { isAdmin } = useAuth();
 
     const [isEditing, setIsEditing] = useState(false);
     const [tempTitle, setTempTitle] = useState(title);
-    const [tempAuthor, setTempAuthor] = useState(author);
     const [tempPrice, setTempPrice] = useState(price);
-    const [tempCopies, setTempCopies] = useState(copies ?? 1);
+    const [tempCopies, setTempCopies] = useState(copies);
+    const [tempPlatform, setTempPlatform] = useState(platform);
+    const [tempGenre, setTempGenre] = useState(genre);
 
     const handleSave = () => {
-        const updatedBook = {
+        const updatedGame = {
             id,
             title: tempTitle,
-            author: tempAuthor,
             price: parseFloat(tempPrice),
-            copies: parseInt(tempCopies)
+            copies: parseInt(tempCopies),
+            platform: tempPlatform,
+            genre: tempGenre
         };
 
-        onUpdate(id, updatedBook);
+        onUpdate(id, updatedGame);
         setIsEditing(false);
     };
 
     if (isEditing) {
         return (
             <div className="book-row editing">
-                <input
-                    type="text"
-                    value={tempTitle}
-                    onChange={(e) => setTempTitle(e.target.value)}
-                />
-                <input
-                    type="text"
-                    value={tempAuthor}
-                    onChange={(e) => setTempAuthor(e.target.value)}
-                />
-                <input
-                    type="number"
-                    step="0.01"
-                    value={tempPrice}
-                    onChange={(e) => setTempPrice(e.target.value)}
-                />
-                <input
-                    type="number"
-                    value={tempCopies}
-                    onChange={(e) => setTempCopies(e.target.value)}
-                />
+                <input value={tempTitle} onChange={(e) => setTempTitle(e.target.value)} />
+                <input type="number" step="0.01" value={tempPrice} onChange={(e) => setTempPrice(e.target.value)} />
+                <input type="number" value={tempCopies} onChange={(e) => setTempCopies(e.target.value)} />
+                <input value={tempPlatform} onChange={(e) => setTempPlatform(e.target.value)} />
+                <input value={tempGenre} onChange={(e) => setTempGenre(e.target.value)} />
                 <button onClick={handleSave}>Save</button>
                 <button onClick={() => setIsEditing(false)}>Cancel</button>
             </div>
@@ -58,7 +44,7 @@ function Book({ id, title, author, price, copies, onDelete, onUpdate, onAddToCar
             <div className="book-info">
                 <h3>{title}</h3>
                 <p>
-                    <strong>Author:</strong> {author} | <strong>Price:</strong> ${Number(price).toFixed(2)}
+                    <strong>Platform:</strong> {platform} | <strong>Genre:</strong> {genre} | <strong>Price:</strong> ${Number(price).toFixed(2)} | <strong>Copies:</strong> {copies}
                 </p>
             </div>
 
@@ -91,4 +77,4 @@ function Book({ id, title, author, price, copies, onDelete, onUpdate, onAddToCar
     );
 }
 
-export default Book;
+export default Game;

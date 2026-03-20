@@ -1,43 +1,43 @@
 import { useState } from 'react';
 
-function MagazineForm({ onMagazineAdded, api }) {
+function GameForm({ onGameAdded, api }) {
     const [title, setTitle] = useState('');
     const [price, setPrice] = useState('');
     const [copies, setCopies] = useState('');
-    const [orderQty, setOrderQty] = useState('');
-    const [currentIssue, setCurrentIssue] = useState('');
+    const [platform, setPlatform] = useState('');
+    const [genre, setGenre] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const newMagazine = {
+        const newGame = {
             title,
             price: parseFloat(price),
             copies: parseInt(copies),
-            orderQty: parseInt(orderQty),
-            currentIssue: currentIssue ? `${currentIssue}:00` : null
+            platform,
+            genre
         };
 
         try {
-            const res = await api.post('/magazines', newMagazine);
-            onMagazineAdded(res.data);
+            const res = await api.post('/games', newGame);
+            onGameAdded(res.data);
 
             setTitle('');
             setPrice('');
             setCopies('');
-            setOrderQty('');
-            setCurrentIssue('');
+            setPlatform('');
+            setGenre('');
 
-            alert('Magazine added successfully');
+            alert('Game added successfully');
         } catch (err) {
-            console.error('Add magazine error:', err.response?.data || err.message);
-            alert(`Failed to save magazine: ${err.response?.status || err.message}`);
+            console.error('Add game error:', err.response?.data || err.message);
+            alert(`Error adding game: ${err.response?.status || err.message}`);
         }
     };
 
     return (
         <form onSubmit={handleSubmit} className="form-container">
-            <h2>Add New Magazine</h2>
+            <h2>Add Game</h2>
 
             <input
                 value={title}
@@ -64,23 +64,22 @@ function MagazineForm({ onMagazineAdded, api }) {
             />
 
             <input
-                type="number"
-                value={orderQty}
-                onChange={(e) => setOrderQty(e.target.value)}
-                placeholder="Order Quantity"
+                value={platform}
+                onChange={(e) => setPlatform(e.target.value)}
+                placeholder="Platform"
                 required
             />
 
             <input
-                type="datetime-local"
-                value={currentIssue}
-                onChange={(e) => setCurrentIssue(e.target.value)}
+                value={genre}
+                onChange={(e) => setGenre(e.target.value)}
+                placeholder="Genre"
                 required
             />
 
-            <button type="submit">Save to Database</button>
+            <button type="submit">Add Game</button>
         </form>
     );
 }
 
-export default MagazineForm;
+export default GameForm;
