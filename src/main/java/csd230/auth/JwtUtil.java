@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class JwtUtil {
 
     private final String secret_key = "mysecretkey";
-    private long accessTokenValidity = 10;
+    private long accessTokenValidity = 86400;
 
     private final JwtParser jwtParser;
     private final String TOKEN_HEADER = "Authorization";
