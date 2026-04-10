@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Navbar from './Navbar';
 import Book from './Book';
 import BookForm from './BookForm';
@@ -29,6 +29,11 @@ function App() {
         loadMagazines();
         loadGames();
     }, [token]);
+
+    const cartCount = useMemo(
+        () => cart.reduce((sum, item) => sum + item.qty, 0),
+        [cart]
+    );
 
     const loadBooks = async () => {
         try {
@@ -92,10 +97,8 @@ function App() {
 
     const handleUpdateMagazine = async (id, updated) => {
         try {
-            await api.put(`/magazines/${id}`, updated);
-            setMagazines(prev =>
-                prev.map(m => (m.id === id ? { ...m, ...updated } : m))
-            );
+            const res = await api.put(`/magazines/${id}`, updated);
+            setMagazines(prev => prev.map(m => (m.id === id ? res.data : m)));
             alert('Magazine updated successfully');
         } catch (err) {
             console.error('Update magazine error:', err.response?.data || err.message);
@@ -125,19 +128,29 @@ function App() {
         }
     };
 
-    const handleAddToCart = (item) => {
+    const handleAddToCart = (item, type) => {
+        const cartKey = `${type}-${item.id}`;
+
         setCart(prev => {
-            const existing = prev.find(i => i.id === item.id && i.title === item.title);
+            const existing = prev.find(i => i.cartKey === cartKey);
 
             if (existing) {
                 return prev.map(i =>
-                    i.id === item.id && i.title === item.title
-                        ? { ...i, qty: i.qty + 1 }
-                        : i
+                    i.cartKey === cartKey ? { ...i, qty: i.qty + 1 } : i
                 );
             }
 
-            return [...prev, { ...item, qty: 1 }];
+            return [
+                ...prev,
+                {
+                    cartKey,
+                    id: item.id,
+                    type,
+                    title: item.title,
+                    price: Number(item.price),
+                    qty: 1
+                }
+            ];
         });
     };
 
@@ -148,7 +161,7 @@ function App() {
     return (
         <div className="app-shell">
             <div className="app-container">
-                <Navbar cartCount={cart.reduce((sum, item) => sum + item.qty, 0)} />
+                <Navbar cartCount={cartCount} />
 
                 <Routes>
                     <Route path="/" element={<Navigate to={token ? '/books' : '/login'} replace />} />
@@ -176,7 +189,7 @@ function App() {
                                                     {...book}
                                                     onDelete={handleDeleteBook}
                                                     onUpdate={handleUpdateBook}
-                                                    onAddToCart={() => handleAddToCart(book)}
+                                                    onAddToCart={() => handleAddToCart(book, 'book')}
                                                 />
                                             ))}
                                     </div>
@@ -224,7 +237,7 @@ function App() {
                                                     {...magazine}
                                                     onDelete={handleDeleteMagazine}
                                                     onUpdate={handleUpdateMagazine}
-                                                    onAddToCart={() => handleAddToCart(magazine)}
+                                                    onAddToCart={() => handleAddToCart(magazine, 'magazine')}
                                                 />
                                             ))}
                                     </div>
@@ -272,7 +285,7 @@ function App() {
                                                     {...game}
                                                     onDelete={handleDeleteGame}
                                                     onUpdate={handleUpdateGame}
-                                                    onAddToCart={() => handleAddToCart(game)}
+                                                    onAddToCart={() => handleAddToCart(game, 'game')}
                                                 />
                                             ))}
                                     </div>
