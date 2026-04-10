@@ -9,7 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/games")
-@CrossOrigin(origins = {"http://localhost:5173"})
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174"})
 public class GameController {
 
     private final GameRepository gameRepository;
@@ -44,6 +44,8 @@ public class GameController {
                     game.setCopies(updatedGame.getCopies());
                     game.setPlatform(updatedGame.getPlatform());
                     game.setGenre(updatedGame.getGenre());
+                    game.setStudio(updatedGame.getStudio());
+                    game.setRating(updatedGame.getRating());
                     return ResponseEntity.ok(gameRepository.save(game));
                 })
                 .orElse(ResponseEntity.notFound().build());

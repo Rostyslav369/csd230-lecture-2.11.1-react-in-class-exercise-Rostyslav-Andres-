@@ -36,16 +36,17 @@ public class MagazineController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateMagazine(@PathVariable Long id, @RequestBody MagazineEntity magazineDetails) {
+    public ResponseEntity<MagazineEntity> updateMagazine(@PathVariable Long id, @RequestBody MagazineEntity magazineDetails) {
         return magazineRepository.findById(id).map(magazine -> {
             magazine.setTitle(magazineDetails.getTitle());
             magazine.setPrice(magazineDetails.getPrice());
             magazine.setCopies(magazineDetails.getCopies());
             magazine.setOrderQty(magazineDetails.getOrderQty());
             magazine.setCurrentIssue(magazineDetails.getCurrentIssue());
+            magazine.setCategory(magazineDetails.getCategory());
+            magazine.setPublisher(magazineDetails.getPublisher());
 
-            magazineRepository.save(magazine);
-            return ResponseEntity.noContent().<Void>build();
+            return ResponseEntity.ok(magazineRepository.save(magazine));
         }).orElse(ResponseEntity.notFound().build());
     }
 

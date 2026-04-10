@@ -37,32 +37,22 @@ function Cart({ cart, setCart }) {
             ) : (
                 <div className="book-list">
                     {cart.map(item => (
-                        <div key={item.id} className="book-row">
+                        <div key={`${item.id}-${item.title}`} className="book-row">
                             <div className="book-info">
                                 <h3>{item.title}</h3>
                                 <p>
-                                    <strong>Price:</strong> ${Number(item.price).toFixed(2)} |{' '}
-                                    <strong>Qty:</strong> {item.qty}
+                                    <strong>Price:</strong> ${Number(item.price).toFixed(2)} | <strong>Qty:</strong> {item.qty}
                                 </p>
                             </div>
 
                             <div className="book-actions">
-                                <button
-                                    onClick={() => decreaseQty(item.id)}
-                                    style={{ backgroundColor: '#f59e0b', color: 'white' }}
-                                >
+                                <button onClick={() => decreaseQty(item.id)} style={{ backgroundColor: '#f59e0b', color: 'white' }}>
                                     -1
                                 </button>
-                                <button
-                                    onClick={() => increaseQty(item.id)}
-                                    style={{ backgroundColor: '#2563eb', color: 'white' }}
-                                >
+                                <button onClick={() => increaseQty(item.id)} style={{ backgroundColor: '#2563eb', color: 'white' }}>
                                     +1
                                 </button>
-                                <button
-                                    onClick={() => removeItem(item.id)}
-                                    style={{ backgroundColor: '#ef4444', color: 'white' }}
-                                >
+                                <button onClick={() => removeItem(item.id)} style={{ backgroundColor: '#ef4444', color: 'white' }}>
                                     Remove
                                 </button>
                             </div>

@@ -50,7 +50,7 @@ function Game({ id, title, price, copies, platform, genre, onDelete, onUpdate, o
 
             <div className="book-actions">
                 <button
-                    onClick={() => onAddToCart(id)}
+                    onClick={onAddToCart}
                     style={{ backgroundColor: '#28a745', color: 'white' }}
                 >
                     🛒 Add to Cart

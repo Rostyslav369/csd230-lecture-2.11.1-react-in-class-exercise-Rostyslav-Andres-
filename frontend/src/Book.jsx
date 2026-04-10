@@ -64,7 +64,7 @@ function Book({ id, title, author, price, copies, onDelete, onUpdate, onAddToCar
 
             <div className="book-actions">
                 <button
-                    onClick={() => onAddToCart(id)}
+                    onClick={onAddToCart}
                     style={{ backgroundColor: '#28a745', color: 'white' }}
                 >
                     🛒 Add to Cart

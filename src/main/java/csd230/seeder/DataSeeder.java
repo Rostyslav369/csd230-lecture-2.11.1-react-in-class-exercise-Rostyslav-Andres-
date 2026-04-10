@@ -61,12 +61,17 @@ public class DataSeeder implements CommandLineRunner {
 
     private void seedBooks() {
         System.out.println("Seeding Books...");
+        String[] genres = {"Fantasy", "Sci-Fi", "Mystery", "Romance", "History", "Thriller"};
+
         for (int i = 0; i < 10; i++) {
             BookEntity book = new BookEntity(
                     faker.book().title(),
                     faker.number().randomDouble(2, 10, 100),
                     faker.number().numberBetween(1, 50),
-                    faker.book().author()
+                    faker.book().author(),
+                    genres[faker.number().numberBetween(0, genres.length)],
+                    faker.code().isbn10(),
+                    faker.book().publisher()
             );
             bookRepository.save(book);
         }
@@ -74,6 +79,8 @@ public class DataSeeder implements CommandLineRunner {
 
     private void seedMagazines() {
         System.out.println("Seeding Magazines...");
+        String[] categories = {"Tech", "Fashion", "Sports", "Business", "Travel"};
+
         for (int i = 0; i < 5; i++) {
             LocalDateTime issueDate = faker.date().past(365, TimeUnit.DAYS)
                     .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
@@ -83,7 +90,9 @@ public class DataSeeder implements CommandLineRunner {
                     faker.number().randomDouble(2, 5, 20),
                     faker.number().numberBetween(10, 100),
                     faker.number().numberBetween(100, 500),
-                    issueDate
+                    issueDate,
+                    categories[faker.number().numberBetween(0, categories.length)],
+                    faker.book().publisher()
             );
             magazineRepository.save(mag);
         }
@@ -93,14 +102,18 @@ public class DataSeeder implements CommandLineRunner {
         System.out.println("Seeding Games...");
         String[] platforms = {"PC", "PS5", "Xbox", "Switch"};
         String[] genres = {"Action", "RPG", "Sports", "Adventure"};
+        String[] ratings = {"E", "T", "M"};
 
         for (int i = 0; i < 5; i++) {
-            GameEntity game = new GameEntity();
-            game.setTitle(faker.esports().game());
-            game.setPrice(faker.number().randomDouble(2, 20, 90));
-            game.setCopies(faker.number().numberBetween(5, 40));
-            game.setPlatform(platforms[faker.number().numberBetween(0, platforms.length)]);
-            game.setGenre(genres[faker.number().numberBetween(0, genres.length)]);
+            GameEntity game = new GameEntity(
+                    faker.esports().game(),
+                    faker.number().randomDouble(2, 20, 90),
+                    faker.number().numberBetween(5, 40),
+                    platforms[faker.number().numberBetween(0, platforms.length)],
+                    genres[faker.number().numberBetween(0, genres.length)],
+                    faker.company().name(),
+                    ratings[faker.number().numberBetween(0, ratings.length)]
+            );
             gameRepository.save(game);
         }
     }

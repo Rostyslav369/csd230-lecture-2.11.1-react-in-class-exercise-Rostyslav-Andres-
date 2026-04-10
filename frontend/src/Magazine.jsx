@@ -84,7 +84,7 @@ function Magazine({ id, title, price, copies, orderQty, currentIssue, onDelete, 
 
             <div className="book-actions">
                 <button
-                    onClick={() => onAddToCart(id)}
+                    onClick={onAddToCart}
                     style={{ backgroundColor: '#28a745', color: 'white' }}
                 >
                     🛒 Add to Cart
