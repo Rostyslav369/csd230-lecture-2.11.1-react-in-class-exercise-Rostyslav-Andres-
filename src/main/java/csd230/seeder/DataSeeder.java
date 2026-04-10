@@ -122,7 +122,7 @@ public class DataSeeder implements CommandLineRunner {
 
         for (int i = 0; i < 6; i++) {
             MovieEntity movie = new MovieEntity(
-                    faker.movie().title(),
+                    faker.book().title(),
                     faker.name().fullName(),
                     genres[faker.number().numberBetween(0, genres.length)],
                     ratings[faker.number().numberBetween(0, ratings.length)],
