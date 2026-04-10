@@ -3,6 +3,9 @@ import { useState } from 'react';
 function BookForm({ onBookAdded, api }) {
     const [title, setTitle] = useState('');
     const [author, setAuthor] = useState('');
+    const [genre, setGenre] = useState('');
+    const [isbn, setIsbn] = useState('');
+    const [publisher, setPublisher] = useState('');
     const [price, setPrice] = useState('');
     const [copies, setCopies] = useState('');
 
@@ -12,6 +15,9 @@ function BookForm({ onBookAdded, api }) {
         const newBook = {
             title,
             author,
+            genre,
+            isbn,
+            publisher,
             price: parseFloat(price),
             copies: parseInt(copies)
         };
@@ -22,6 +28,9 @@ function BookForm({ onBookAdded, api }) {
 
             setTitle('');
             setAuthor('');
+            setGenre('');
+            setIsbn('');
+            setPublisher('');
             setPrice('');
             setCopies('');
 
@@ -33,22 +42,14 @@ function BookForm({ onBookAdded, api }) {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="form-container">
+        <form onSubmit={handleSubmit} className="book-form">
             <h2>Add New Book</h2>
 
-            <input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Title"
-                required
-            />
-
-            <input
-                value={author}
-                onChange={(e) => setAuthor(e.target.value)}
-                placeholder="Author"
-                required
-            />
+            <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title" required />
+            <input value={author} onChange={(e) => setAuthor(e.target.value)} placeholder="Author" required />
+            <input value={genre} onChange={(e) => setGenre(e.target.value)} placeholder="Genre" required />
+            <input value={isbn} onChange={(e) => setIsbn(e.target.value)} placeholder="ISBN" required />
+            <input value={publisher} onChange={(e) => setPublisher(e.target.value)} placeholder="Publisher" required />
 
             <input
                 type="number"

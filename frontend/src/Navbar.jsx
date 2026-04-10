@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from './provider/authProvider';
 
-function Navbar() {
+function Navbar({ cartCount = 0 }) {
     const { token, isAdmin } = useAuth();
 
     return (
@@ -17,6 +17,8 @@ function Navbar() {
 
                 <Link to="/games">Games</Link>
                 {isAdmin && <Link to="/add-game">Add Game</Link>}
+
+                {token && <Link to="/cart">Cart ({cartCount})</Link>}
 
                 {!token && <Link to="/login">Login</Link>}
                 {token && <Link to="/logout">Logout</Link>}

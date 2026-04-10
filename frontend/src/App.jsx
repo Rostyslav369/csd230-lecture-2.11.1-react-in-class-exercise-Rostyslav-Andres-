@@ -7,6 +7,7 @@ import Magazine from './Magazine';
 import MagazineForm from './MagazineForm';
 import Game from './Game';
 import GameForm from './GameForm';
+import Cart from './Cart';
 import Login from './pages/Login';
 import Logout from './pages/Logout';
 import { useAuth } from './provider/authProvider';
@@ -19,6 +20,7 @@ function App() {
     const [books, setBooks] = useState([]);
     const [magazines, setMagazines] = useState([]);
     const [games, setGames] = useState([]);
+    const [cart, setCart] = useState([]);
 
     useEffect(() => {
         if (!token) return;
@@ -123,8 +125,20 @@ function App() {
         }
     };
 
-    const handleAddToCart = (id) => {
-        alert(`Add to cart clicked for item ${id}`);
+    const handleAddToCart = (item) => {
+        setCart(prev => {
+            const existing = prev.find(i => i.id === item.id && i.title === item.title);
+
+            if (existing) {
+                return prev.map(i =>
+                    i.id === item.id && i.title === item.title
+                        ? { ...i, qty: i.qty + 1 }
+                        : i
+                );
+            }
+
+            return [...prev, { ...item, qty: 1 }];
+        });
     };
 
     const renderEmptyState = (message) => (
@@ -134,7 +148,7 @@ function App() {
     return (
         <div className="app-shell">
             <div className="app-container">
-                <Navbar />
+                <Navbar cartCount={cart.reduce((sum, item) => sum + item.qty, 0)} />
 
                 <Routes>
                     <Route path="/" element={<Navigate to={token ? '/books' : '/login'} replace />} />
@@ -162,7 +176,7 @@ function App() {
                                                     {...book}
                                                     onDelete={handleDeleteBook}
                                                     onUpdate={handleUpdateBook}
-                                                    onAddToCart={handleAddToCart}
+                                                    onAddToCart={() => handleAddToCart(book)}
                                                 />
                                             ))}
                                     </div>
@@ -210,7 +224,7 @@ function App() {
                                                     {...magazine}
                                                     onDelete={handleDeleteMagazine}
                                                     onUpdate={handleUpdateMagazine}
-                                                    onAddToCart={handleAddToCart}
+                                                    onAddToCart={() => handleAddToCart(magazine)}
                                                 />
                                             ))}
                                     </div>
@@ -258,7 +272,7 @@ function App() {
                                                     {...game}
                                                     onDelete={handleDeleteGame}
                                                     onUpdate={handleUpdateGame}
-                                                    onAddToCart={handleAddToCart}
+                                                    onAddToCart={() => handleAddToCart(game)}
                                                 />
                                             ))}
                                     </div>
@@ -279,6 +293,17 @@ function App() {
                                         api={api}
                                     />
                                 </div>
+                            ) : (
+                                <Navigate to="/login" replace />
+                            )
+                        }
+                    />
+
+                    <Route
+                        path="/cart"
+                        element={
+                            token ? (
+                                <Cart cart={cart} setCart={setCart} />
                             ) : (
                                 <Navigate to="/login" replace />
                             )

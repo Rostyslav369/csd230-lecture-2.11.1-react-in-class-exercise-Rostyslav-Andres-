@@ -15,13 +15,18 @@ public class MagazineEntity extends PublicationEntity {
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime currentIssue;
 
+    private String category;
+    private String publisher;
+
     public MagazineEntity() {
     }
 
-    public MagazineEntity(String title, double price, int copies, int orderQty, LocalDateTime currentIssue) {
+    public MagazineEntity(String title, double price, int copies, int orderQty, LocalDateTime currentIssue, String category, String publisher) {
         super(title, price, copies);
         this.orderQty = orderQty;
         this.currentIssue = currentIssue;
+        this.category = category;
+        this.publisher = publisher;
     }
 
     public int getOrderQty() {
@@ -40,11 +45,29 @@ public class MagazineEntity extends PublicationEntity {
         this.currentIssue = currentIssue;
     }
 
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public String getPublisher() {
+        return publisher;
+    }
+
+    public void setPublisher(String publisher) {
+        this.publisher = publisher;
+    }
+
     @Override
     public String toString() {
         return "MagazineEntity{" +
                 "orderQty=" + orderQty +
                 ", currentIssue=" + currentIssue +
+                ", category='" + category + '\'' +
+                ", publisher='" + publisher + '\'' +
                 "} " + super.toString();
     }
 }

@@ -6,6 +6,8 @@ function GameForm({ onGameAdded, api }) {
     const [copies, setCopies] = useState('');
     const [platform, setPlatform] = useState('');
     const [genre, setGenre] = useState('');
+    const [studio, setStudio] = useState('');
+    const [rating, setRating] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -15,7 +17,9 @@ function GameForm({ onGameAdded, api }) {
             price: parseFloat(price),
             copies: parseInt(copies),
             platform,
-            genre
+            genre,
+            studio,
+            rating
         };
 
         try {
@@ -27,6 +31,8 @@ function GameForm({ onGameAdded, api }) {
             setCopies('');
             setPlatform('');
             setGenre('');
+            setStudio('');
+            setRating('');
 
             alert('Game added successfully');
         } catch (err) {
@@ -36,15 +42,10 @@ function GameForm({ onGameAdded, api }) {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="form-container">
+        <form onSubmit={handleSubmit} className="book-form">
             <h2>Add Game</h2>
 
-            <input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Title"
-                required
-            />
+            <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title" required />
 
             <input
                 type="number"
@@ -63,19 +64,10 @@ function GameForm({ onGameAdded, api }) {
                 required
             />
 
-            <input
-                value={platform}
-                onChange={(e) => setPlatform(e.target.value)}
-                placeholder="Platform"
-                required
-            />
-
-            <input
-                value={genre}
-                onChange={(e) => setGenre(e.target.value)}
-                placeholder="Genre"
-                required
-            />
+            <input value={platform} onChange={(e) => setPlatform(e.target.value)} placeholder="Platform" required />
+            <input value={genre} onChange={(e) => setGenre(e.target.value)} placeholder="Genre" required />
+            <input value={studio} onChange={(e) => setStudio(e.target.value)} placeholder="Studio" required />
+            <input value={rating} onChange={(e) => setRating(e.target.value)} placeholder="Rating (E, T, M)" required />
 
             <button type="submit">Add Game</button>
         </form>
