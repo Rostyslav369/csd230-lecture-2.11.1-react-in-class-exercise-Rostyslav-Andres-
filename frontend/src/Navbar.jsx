@@ -18,6 +18,9 @@ function Navbar({ cartCount = 0 }) {
                 <Link to="/games">Games</Link>
                 {isAdmin && <Link to="/add-game">Add Game</Link>}
 
+                <Link to="/movies">Movies</Link>
+                {isAdmin && <Link to="/add-movie">Add Movie</Link>}
+
                 {token && <Link to="/cart">Cart ({cartCount})</Link>}
 
                 {!token && <Link to="/login">Login</Link>}

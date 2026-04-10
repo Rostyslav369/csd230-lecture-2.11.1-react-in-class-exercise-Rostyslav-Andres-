@@ -7,6 +7,8 @@ import Magazine from './Magazine';
 import MagazineForm from './MagazineForm';
 import Game from './Game';
 import GameForm from './GameForm';
+import Movie from './Movie';
+import MovieForm from './MovieForm';
 import Cart from './Cart';
 import Login from './pages/Login';
 import Logout from './pages/Logout';
@@ -20,14 +22,15 @@ function App() {
     const [books, setBooks] = useState([]);
     const [magazines, setMagazines] = useState([]);
     const [games, setGames] = useState([]);
+    const [movies, setMovies] = useState([]);
     const [cart, setCart] = useState([]);
 
     useEffect(() => {
         if (!token) return;
-
         loadBooks();
         loadMagazines();
         loadGames();
+        loadMovies();
     }, [token]);
 
     const cartCount = useMemo(
@@ -59,6 +62,15 @@ function App() {
             setGames(res.data);
         } catch (err) {
             console.error('Load games error:', err.response?.data || err.message);
+        }
+    };
+
+    const loadMovies = async () => {
+        try {
+            const res = await api.get('/movies');
+            setMovies(res.data);
+        } catch (err) {
+            console.error('Load movies error:', err.response?.data || err.message);
         }
     };
 
@@ -128,6 +140,28 @@ function App() {
         }
     };
 
+    const handleDeleteMovie = async (id) => {
+        try {
+            await api.delete(`/movies/${id}`);
+            setMovies(prev => prev.filter(m => m.id !== id));
+            alert('Movie deleted successfully');
+        } catch (err) {
+            console.error('Delete movie error:', err.response?.data || err.message);
+            alert(`Delete failed: ${err.response?.status || err.message}`);
+        }
+    };
+
+    const handleUpdateMovie = async (id, updated) => {
+        try {
+            const res = await api.put(`/movies/${id}`, updated);
+            setMovies(prev => prev.map(m => (m.id === id ? res.data : m)));
+            alert('Movie updated successfully');
+        } catch (err) {
+            console.error('Update movie error:', err.response?.data || err.message);
+            alert(`Update failed: ${err.response?.status || err.message}`);
+        }
+    };
+
     const handleAddToCart = (item, type) => {
         const cartKey = `${type}-${item.id}`;
 
@@ -170,157 +204,145 @@ function App() {
 
                     <Route
                         path="/books"
-                        element={
-                            token ? (
-                                <div className="page-panel">
-                                    <div className="page-header">
-                                        <div>
-                                            <h1>Books</h1>
-                                            <p className="page-subtitle">Manage your digital library collection with style.</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="book-list">
-                                        {books.length === 0
-                                            ? renderEmptyState('No books available yet.')
-                                            : books.map(book => (
-                                                <Book
-                                                    key={book.id}
-                                                    {...book}
-                                                    onDelete={handleDeleteBook}
-                                                    onUpdate={handleUpdateBook}
-                                                    onAddToCart={() => handleAddToCart(book, 'book')}
-                                                />
-                                            ))}
+                        element={token ? (
+                            <div className="page-panel">
+                                <div className="page-header">
+                                    <div>
+                                        <h1>Books</h1>
+                                        <p className="page-subtitle">Manage your digital library collection with style.</p>
                                     </div>
                                 </div>
-                            ) : (
-                                <Navigate to="/login" replace />
-                            )
-                        }
+                                <div className="book-list">
+                                    {books.length === 0 ? renderEmptyState('No books available yet.') : books.map(book => (
+                                        <Book
+                                            key={book.id}
+                                            {...book}
+                                            onDelete={handleDeleteBook}
+                                            onUpdate={handleUpdateBook}
+                                            onAddToCart={() => handleAddToCart(book, 'book')}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        ) : <Navigate to="/login" replace />}
                     />
 
                     <Route
                         path="/add-book"
-                        element={
-                            token && isAdmin ? (
-                                <div className="page-panel">
-                                    <BookForm
-                                        onBookAdded={(b) => setBooks(prev => [...prev, b])}
-                                        api={api}
-                                    />
-                                </div>
-                            ) : (
-                                <Navigate to="/login" replace />
-                            )
-                        }
+                        element={token && isAdmin ? (
+                            <div className="page-panel">
+                                <BookForm onBookAdded={(b) => setBooks(prev => [...prev, b])} api={api} />
+                            </div>
+                        ) : <Navigate to="/login" replace />}
                     />
 
                     <Route
                         path="/magazines"
-                        element={
-                            token ? (
-                                <div className="page-panel">
-                                    <div className="page-header">
-                                        <div>
-                                            <h1>Magazines</h1>
-                                            <p className="page-subtitle">Browse and manage your magazine catalog.</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="book-list">
-                                        {magazines.length === 0
-                                            ? renderEmptyState('No magazines available yet.')
-                                            : magazines.map(magazine => (
-                                                <Magazine
-                                                    key={magazine.id}
-                                                    {...magazine}
-                                                    onDelete={handleDeleteMagazine}
-                                                    onUpdate={handleUpdateMagazine}
-                                                    onAddToCart={() => handleAddToCart(magazine, 'magazine')}
-                                                />
-                                            ))}
+                        element={token ? (
+                            <div className="page-panel">
+                                <div className="page-header">
+                                    <div>
+                                        <h1>Magazines</h1>
+                                        <p className="page-subtitle">Browse and manage your magazine catalog.</p>
                                     </div>
                                 </div>
-                            ) : (
-                                <Navigate to="/login" replace />
-                            )
-                        }
+                                <div className="book-list">
+                                    {magazines.length === 0 ? renderEmptyState('No magazines available yet.') : magazines.map(magazine => (
+                                        <Magazine
+                                            key={magazine.id}
+                                            {...magazine}
+                                            onDelete={handleDeleteMagazine}
+                                            onUpdate={handleUpdateMagazine}
+                                            onAddToCart={() => handleAddToCart(magazine, 'magazine')}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        ) : <Navigate to="/login" replace />}
                     />
 
                     <Route
                         path="/add-magazine"
-                        element={
-                            token && isAdmin ? (
-                                <div className="page-panel">
-                                    <MagazineForm
-                                        onMagazineAdded={(m) => setMagazines(prev => [...prev, m])}
-                                        api={api}
-                                    />
-                                </div>
-                            ) : (
-                                <Navigate to="/login" replace />
-                            )
-                        }
+                        element={token && isAdmin ? (
+                            <div className="page-panel">
+                                <MagazineForm onMagazineAdded={(m) => setMagazines(prev => [...prev, m])} api={api} />
+                            </div>
+                        ) : <Navigate to="/login" replace />}
                     />
 
                     <Route
                         path="/games"
-                        element={
-                            token ? (
-                                <div className="page-panel">
-                                    <div className="page-header">
-                                        <div>
-                                            <h1>Games</h1>
-                                            <p className="page-subtitle">Keep your interactive media collection organized.</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="book-list">
-                                        {games.length === 0
-                                            ? renderEmptyState('No games available yet.')
-                                            : games.map(game => (
-                                                <Game
-                                                    key={game.id}
-                                                    {...game}
-                                                    onDelete={handleDeleteGame}
-                                                    onUpdate={handleUpdateGame}
-                                                    onAddToCart={() => handleAddToCart(game, 'game')}
-                                                />
-                                            ))}
+                        element={token ? (
+                            <div className="page-panel">
+                                <div className="page-header">
+                                    <div>
+                                        <h1>Games</h1>
+                                        <p className="page-subtitle">Keep your interactive media collection organized.</p>
                                     </div>
                                 </div>
-                            ) : (
-                                <Navigate to="/login" replace />
-                            )
-                        }
+                                <div className="book-list">
+                                    {games.length === 0 ? renderEmptyState('No games available yet.') : games.map(game => (
+                                        <Game
+                                            key={game.id}
+                                            {...game}
+                                            onDelete={handleDeleteGame}
+                                            onUpdate={handleUpdateGame}
+                                            onAddToCart={() => handleAddToCart(game, 'game')}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        ) : <Navigate to="/login" replace />}
                     />
 
                     <Route
                         path="/add-game"
-                        element={
-                            token && isAdmin ? (
-                                <div className="page-panel">
-                                    <GameForm
-                                        onGameAdded={(g) => setGames(prev => [...prev, g])}
-                                        api={api}
-                                    />
+                        element={token && isAdmin ? (
+                            <div className="page-panel">
+                                <GameForm onGameAdded={(g) => setGames(prev => [...prev, g])} api={api} />
+                            </div>
+                        ) : <Navigate to="/login" replace />}
+                    />
+
+                    <Route
+                        path="/movies"
+                        element={token ? (
+                            <div className="page-panel">
+                                <div className="page-header">
+                                    <div>
+                                        <h1>Movies</h1>
+                                        <p className="page-subtitle">Expand your media catalog with movies.</p>
+                                    </div>
                                 </div>
-                            ) : (
-                                <Navigate to="/login" replace />
-                            )
-                        }
+                                <div className="book-list">
+                                    {movies.length === 0 ? renderEmptyState('No movies available yet.') : movies.map(movie => (
+                                        <Movie
+                                            key={movie.id}
+                                            {...movie}
+                                            onDelete={handleDeleteMovie}
+                                            onUpdate={handleUpdateMovie}
+                                            onAddToCart={() => handleAddToCart(movie, 'movie')}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        ) : <Navigate to="/login" replace />}
+                    />
+
+                    <Route
+                        path="/add-movie"
+                        element={token && isAdmin ? (
+                            <div className="page-panel">
+                                <MovieForm onMovieAdded={(m) => setMovies(prev => [...prev, m])} api={api} />
+                            </div>
+                        ) : <Navigate to="/login" replace />}
                     />
 
                     <Route
                         path="/cart"
-                        element={
-                            token ? (
-                                <Cart cart={cart} setCart={setCart} />
-                            ) : (
-                                <Navigate to="/login" replace />
-                            )
-                        }
+                        element={token ? (
+                            <Cart cart={cart} setCart={setCart} />
+                        ) : <Navigate to="/login" replace />}
                     />
                 </Routes>
             </div>

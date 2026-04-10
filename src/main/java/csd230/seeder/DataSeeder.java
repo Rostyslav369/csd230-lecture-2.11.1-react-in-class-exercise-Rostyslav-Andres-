@@ -3,10 +3,12 @@ package csd230.seeder;
 import csd230.entities.BookEntity;
 import csd230.entities.GameEntity;
 import csd230.entities.MagazineEntity;
+import csd230.entities.MovieEntity;
 import csd230.entities.UserEntity;
 import csd230.repositories.BookRepository;
 import csd230.repositories.GameRepository;
 import csd230.repositories.MagazineRepository;
+import csd230.repositories.MovieRepository;
 import csd230.repositories.UserRepository;
 import net.datafaker.Faker;
 import org.springframework.boot.CommandLineRunner;
@@ -23,6 +25,7 @@ public class DataSeeder implements CommandLineRunner {
     private final BookRepository bookRepository;
     private final MagazineRepository magazineRepository;
     private final GameRepository gameRepository;
+    private final MovieRepository movieRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final Faker faker;
@@ -31,12 +34,14 @@ public class DataSeeder implements CommandLineRunner {
             BookRepository bookRepository,
             MagazineRepository magazineRepository,
             GameRepository gameRepository,
+            MovieRepository movieRepository,
             UserRepository userRepository,
             PasswordEncoder passwordEncoder
     ) {
         this.bookRepository = bookRepository;
         this.magazineRepository = magazineRepository;
         this.gameRepository = gameRepository;
+        this.movieRepository = movieRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.faker = new Faker();
@@ -44,18 +49,10 @@ public class DataSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (bookRepository.count() == 0) {
-            seedBooks();
-        }
-
-        if (magazineRepository.count() == 0) {
-            seedMagazines();
-        }
-
-        if (gameRepository.count() == 0) {
-            seedGames();
-        }
-
+        if (bookRepository.count() == 0) seedBooks();
+        if (magazineRepository.count() == 0) seedMagazines();
+        if (gameRepository.count() == 0) seedGames();
+        if (movieRepository.count() == 0) seedMovies();
         seedUsers();
     }
 
@@ -115,6 +112,25 @@ public class DataSeeder implements CommandLineRunner {
                     ratings[faker.number().numberBetween(0, ratings.length)]
             );
             gameRepository.save(game);
+        }
+    }
+
+    private void seedMovies() {
+        System.out.println("Seeding Movies...");
+        String[] genres = {"Action", "Drama", "Comedy", "Sci-Fi", "Thriller"};
+        String[] ratings = {"G", "PG", "PG-13", "R"};
+
+        for (int i = 0; i < 6; i++) {
+            MovieEntity movie = new MovieEntity(
+                    faker.movie().title(),
+                    faker.name().fullName(),
+                    genres[faker.number().numberBetween(0, genres.length)],
+                    ratings[faker.number().numberBetween(0, ratings.length)],
+                    faker.number().randomDouble(2, 8, 40),
+                    faker.number().numberBetween(2, 30),
+                    faker.number().numberBetween(80, 180)
+            );
+            movieRepository.save(movie);
         }
     }
 
