@@ -127,124 +127,166 @@ function App() {
         alert(`Add to cart clicked for item ${id}`);
     };
 
+    const renderEmptyState = (message) => (
+        <div className="empty-state">{message}</div>
+    );
+
     return (
-        <>
-            <Navbar />
+        <div className="app-shell">
+            <div className="app-container">
+                <Navbar />
 
-            <Routes>
-                <Route path="/" element={<Navigate to={token ? '/books' : '/login'} replace />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/logout" element={<Logout />} />
+                <Routes>
+                    <Route path="/" element={<Navigate to={token ? '/books' : '/login'} replace />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/logout" element={<Logout />} />
 
-                <Route
-                    path="/books"
-                    element={
-                        token ? (
-                            <div className="book-list">
-                                <h1>Books</h1>
-                                {books.map(book => (
-                                    <Book
-                                        key={book.id}
-                                        {...book}
-                                        onDelete={handleDeleteBook}
-                                        onUpdate={handleUpdateBook}
-                                        onAddToCart={handleAddToCart}
+                    <Route
+                        path="/books"
+                        element={
+                            token ? (
+                                <div className="page-panel">
+                                    <div className="page-header">
+                                        <div>
+                                            <h1>Books</h1>
+                                            <p className="page-subtitle">Manage your digital library collection with style.</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="book-list">
+                                        {books.length === 0
+                                            ? renderEmptyState('No books available yet.')
+                                            : books.map(book => (
+                                                <Book
+                                                    key={book.id}
+                                                    {...book}
+                                                    onDelete={handleDeleteBook}
+                                                    onUpdate={handleUpdateBook}
+                                                    onAddToCart={handleAddToCart}
+                                                />
+                                            ))}
+                                    </div>
+                                </div>
+                            ) : (
+                                <Navigate to="/login" replace />
+                            )
+                        }
+                    />
+
+                    <Route
+                        path="/add-book"
+                        element={
+                            token && isAdmin ? (
+                                <div className="page-panel">
+                                    <BookForm
+                                        onBookAdded={(b) => setBooks(prev => [...prev, b])}
+                                        api={api}
                                     />
-                                ))}
-                            </div>
-                        ) : (
-                            <Navigate to="/login" replace />
-                        )
-                    }
-                />
+                                </div>
+                            ) : (
+                                <Navigate to="/login" replace />
+                            )
+                        }
+                    />
 
-                <Route
-                    path="/add-book"
-                    element={
-                        token && isAdmin ? (
-                            <BookForm
-                                onBookAdded={(b) => setBooks(prev => [...prev, b])}
-                                api={api}
-                            />
-                        ) : (
-                            <Navigate to="/login" replace />
-                        )
-                    }
-                />
+                    <Route
+                        path="/magazines"
+                        element={
+                            token ? (
+                                <div className="page-panel">
+                                    <div className="page-header">
+                                        <div>
+                                            <h1>Magazines</h1>
+                                            <p className="page-subtitle">Browse and manage your magazine catalog.</p>
+                                        </div>
+                                    </div>
 
-                <Route
-                    path="/magazines"
-                    element={
-                        token ? (
-                            <div className="book-list">
-                                <h1>Magazines</h1>
-                                {magazines.map(magazine => (
-                                    <Magazine
-                                        key={magazine.id}
-                                        {...magazine}
-                                        onDelete={handleDeleteMagazine}
-                                        onUpdate={handleUpdateMagazine}
-                                        onAddToCart={handleAddToCart}
+                                    <div className="book-list">
+                                        {magazines.length === 0
+                                            ? renderEmptyState('No magazines available yet.')
+                                            : magazines.map(magazine => (
+                                                <Magazine
+                                                    key={magazine.id}
+                                                    {...magazine}
+                                                    onDelete={handleDeleteMagazine}
+                                                    onUpdate={handleUpdateMagazine}
+                                                    onAddToCart={handleAddToCart}
+                                                />
+                                            ))}
+                                    </div>
+                                </div>
+                            ) : (
+                                <Navigate to="/login" replace />
+                            )
+                        }
+                    />
+
+                    <Route
+                        path="/add-magazine"
+                        element={
+                            token && isAdmin ? (
+                                <div className="page-panel">
+                                    <MagazineForm
+                                        onMagazineAdded={(m) => setMagazines(prev => [...prev, m])}
+                                        api={api}
                                     />
-                                ))}
-                            </div>
-                        ) : (
-                            <Navigate to="/login" replace />
-                        )
-                    }
-                />
+                                </div>
+                            ) : (
+                                <Navigate to="/login" replace />
+                            )
+                        }
+                    />
 
-                <Route
-                    path="/add-magazine"
-                    element={
-                        token && isAdmin ? (
-                            <MagazineForm
-                                onMagazineAdded={(m) => setMagazines(prev => [...prev, m])}
-                                api={api}
-                            />
-                        ) : (
-                            <Navigate to="/login" replace />
-                        )
-                    }
-                />
+                    <Route
+                        path="/games"
+                        element={
+                            token ? (
+                                <div className="page-panel">
+                                    <div className="page-header">
+                                        <div>
+                                            <h1>Games</h1>
+                                            <p className="page-subtitle">Keep your interactive media collection organized.</p>
+                                        </div>
+                                    </div>
 
-                <Route
-                    path="/games"
-                    element={
-                        token ? (
-                            <div className="book-list">
-                                <h1>Games</h1>
-                                {games.map(game => (
-                                    <Game
-                                        key={game.id}
-                                        {...game}
-                                        onDelete={handleDeleteGame}
-                                        onUpdate={handleUpdateGame}
-                                        onAddToCart={handleAddToCart}
+                                    <div className="book-list">
+                                        {games.length === 0
+                                            ? renderEmptyState('No games available yet.')
+                                            : games.map(game => (
+                                                <Game
+                                                    key={game.id}
+                                                    {...game}
+                                                    onDelete={handleDeleteGame}
+                                                    onUpdate={handleUpdateGame}
+                                                    onAddToCart={handleAddToCart}
+                                                />
+                                            ))}
+                                    </div>
+                                </div>
+                            ) : (
+                                <Navigate to="/login" replace />
+                            )
+                        }
+                    />
+
+                    <Route
+                        path="/add-game"
+                        element={
+                            token && isAdmin ? (
+                                <div className="page-panel">
+                                    <GameForm
+                                        onGameAdded={(g) => setGames(prev => [...prev, g])}
+                                        api={api}
                                     />
-                                ))}
-                            </div>
-                        ) : (
-                            <Navigate to="/login" replace />
-                        )
-                    }
-                />
-
-                <Route
-                    path="/add-game"
-                    element={
-                        token && isAdmin ? (
-                            <GameForm
-                                onGameAdded={(g) => setGames(prev => [...prev, g])}
-                                api={api}
-                            />
-                        ) : (
-                            <Navigate to="/login" replace />
-                        )
-                    }
-                />
-            </Routes>
-        </>
+                                </div>
+                            ) : (
+                                <Navigate to="/login" replace />
+                            )
+                        }
+                    />
+                </Routes>
+            </div>
+        </div>
     );
 }
 
